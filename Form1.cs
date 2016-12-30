@@ -1,31 +1,44 @@
 ﻿using Microsoft.Win32;
-using System;
-using System.Windows.Forms;
-using NAudio.Wave;
 using NAudio.Codecs;
 using NAudio.Lame;
+using NAudio.Wave;
+using System;
 using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace DesktopRecorder
 {
+    static class NativeMethods
+    {
+        [DllImport("kernel32.dll")]
+        public static extern IntPtr LoadLibrary(string dllToLoad);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool FreeLibrary(IntPtr hModule);
+    }
+
     public partial class Form1 : Form
     {
+
         private static WasapiLoopbackCapture mx;
 
+        private static bool G722Audio = false;
         private static G722CodecState _state;
         private static G722Codec _codec = new G722Codec();
-        private static int _bitrate = 256;
 
-        private static bool G722Audio = false;
         private static bool Mp3Audio = true;
-
         private static LameMP3FileWriter writer;
+        private static IntPtr mp3lib;
+
+        private static int _bitrate = 256;
 
         private static int _rate = 48000;
         private static int _bits = 16;
         private static int _channels = 2;
 
-        private static NAudio.Wave.WaveFormat frm; //todo private static NAudio.Wave.AdpcmWaveFormat adpcmfrm; //AdpcmWaveFormat(8000, 1) //NAudio.MnException: WaveBadFormat calling waveOutOpen
+        private static NAudio.Wave.WaveFormat frm;
 
         private static Stream stdout;
 
@@ -39,7 +52,10 @@ namespace DesktopRecorder
 
         private static int count;
 
+        private string dllPath;
+
         internal RegistryKey registry;
+
         public Form1()
         {
             InitializeComponent();
@@ -98,6 +114,42 @@ namespace DesktopRecorder
             comboBox5.Items.Add(new Item("64", 64));
             comboBox5.Items.Add(new Item("128", 128));
             comboBox5.Items.Add(new Item("256", 256));
+
+            string dirName = Path.GetTempPath();
+            if (!Directory.Exists(dirName))
+            {
+                Directory.CreateDirectory(dirName);
+            }
+
+            dllPath = Path.Combine(dirName, "libmp3lame.dll");
+
+            using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DesktopRecorder.libmp3lame.dll"))
+            {
+                try
+                {
+                    using (Stream outFile = File.Create(dllPath))
+                    {
+                        const int bufs = 4096;
+                        byte[] buf = new byte[bufs];
+                        while (true)
+                        {
+                            int read = stream.Read(buf, 0, bufs);
+                            if (read < 1)
+                                break;
+                            outFile.Write(buf, 0, read);
+                        }
+                    }
+                }
+                catch
+                { }
+            }
+
+            mp3lib = NativeMethods.LoadLibrary(dllPath);
+
+            if (mp3lib == IntPtr.Zero)
+            {
+                DialogResult result = MessageBox.Show("Cannot load Lame Mp3 Library (libmp3lame.dll)", "Error", MessageBoxButtons.OK);
+            }
         }
 
         private void ErrorMessage(string msg)
@@ -316,5 +368,9 @@ namespace DesktopRecorder
             return output;
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            NativeMethods.FreeLibrary(mp3lib);
+        }
     }
 }

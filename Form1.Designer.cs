@@ -1,4 +1,6 @@
-﻿namespace DesktopRecorder
+﻿using System.Windows.Forms;
+
+namespace DesktopRecorder
 {
     partial class Form1
     {
@@ -141,6 +143,8 @@
             this.Text = "Desktop Recorder";
             this.ResumeLayout(false);
             this.PerformLayout();
+
+            this.FormClosing += new FormClosingEventHandler(this.Form1_FormClosing);
 
         }
 
