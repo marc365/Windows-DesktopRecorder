@@ -47,7 +47,6 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Help.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Lame\LibMp3Lame.cs" />
     <Compile Include="Lame\MP3FileWriter.cs" />
