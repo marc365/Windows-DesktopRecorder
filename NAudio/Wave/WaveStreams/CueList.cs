@@ -266,32 +266,5 @@ namespace NAudio.Wave
 	    {
             get { return cues[index]; }
 	    }
-
-        /// <summary>
-        /// Checks if the cue and list chunks exist and if so, creates a cue list
-        /// </summary>
-        internal static CueList FromChunks(WaveFileReader reader)
-        {
-            CueList cueList = null;
-            byte[] cueChunkData = null;
-            byte[] listChunkData = null;
-
-            foreach (RiffChunk chunk in reader.ExtraChunks)
-            {
-                if (chunk.IdentifierAsString.ToLower() == "cue ")
-                {
-                    cueChunkData = reader.GetChunkData(chunk);
-                }
-                else if (chunk.IdentifierAsString.ToLower() == "list")
-                {
-                    listChunkData = reader.GetChunkData(chunk);
-                }
-            }
-            if (cueChunkData != null && listChunkData != null)
-            {
-                cueList = new CueList(cueChunkData, listChunkData);
-            }
-            return cueList;
-        }
     }
 }

@@ -42,9 +42,7 @@ namespace DesktopRecorder
 
             InitializeComponent();
 
-            this.BackColor = System.Drawing.Color.LightGray;
-            textBox2.ForeColor = System.Drawing.Color.DarkRed;
-            textBox2.BackColor = System.Drawing.Color.LightGray;
+            this.BackColor = System.Drawing.Color.WhiteSmoke;
 
             registry = Registry.CurrentUser.OpenSubKey(_regKey);
             if (registry != null)
@@ -120,16 +118,6 @@ namespace DesktopRecorder
             }
         }
 
-        private void ErrorMessage(string msg)
-        {
-            textBox2.Text = string.Format("Error: {0}", msg);
-        }
-
-        private void ErrorClear()
-        {
-            textBox2.Text = string.Empty;
-        }
-
         private void ModeSwap()
         {
             if (_mode == 1)
@@ -146,9 +134,7 @@ namespace DesktopRecorder
         {
             if (_REC) // Stop
             {
-                this.BackColor = System.Drawing.Color.LightGray;
-                textBox2.ForeColor = System.Drawing.Color.DarkRed;
-                textBox2.BackColor = System.Drawing.Color.LightGray;
+                this.BackColor = System.Drawing.Color.WhiteSmoke;
 
                 button1.Text = "Record";
                 _REC = false;
@@ -175,12 +161,8 @@ namespace DesktopRecorder
 
                 if (textBox1.Text == string.Empty)
                 {
-                    ErrorMessage("File not specified");
+                    DialogResult result = MessageBox.Show("File not specified", "Error", MessageBoxButtons.OK);
                     return;
-                }
-                else
-                {
-                    ErrorClear();
                 }
 
                 try
@@ -235,8 +217,6 @@ namespace DesktopRecorder
                 }
 
                 this.BackColor = System.Drawing.Color.DarkRed;
-                textBox2.ForeColor = System.Drawing.Color.LightGray;
-                textBox2.BackColor = System.Drawing.Color.DarkRed;
 
                 button1.Text = "Stop";
                 _REC = true;
@@ -255,6 +235,11 @@ namespace DesktopRecorder
             {
                 textBox1.Text = dialog.FileName;
             }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            System.Environment.Exit(0);
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -419,6 +404,22 @@ namespace DesktopRecorder
 
             // Sub-chunk 2 size.
             stream.Write(BitConverter.GetBytes((bitDepth / 8) * totalSampleCount), 0, 4);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+            if (m.Msg == WM_NCHITTEST)
+                m.Result = (IntPtr)(HT_CAPTION);
+        }
+
+        private const int WM_NCHITTEST = 0x84;
+        private const int HT_CLIENT = 0x1;
+        private const int HT_CAPTION = 0x2;
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
