@@ -33,6 +33,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -41,14 +43,16 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Form1.cs" />
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Item.cs" />
     <Compile Include="Lame\LibMp3Lame.cs" />
     <Compile Include="Lame\MP3FileWriter.cs" />
-    <Compile Include="NAudio\Codecs\G722Codec.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="NAudio\CoreAudioApi\AudioCaptureClient.cs" />
     <Compile Include="NAudio\CoreAudioApi\AudioClient.cs" />
     <Compile Include="NAudio\CoreAudioApi\AudioClientBufferFlags.cs" />
@@ -164,18 +168,15 @@
     <Compile Include="NAudio\Utils\MergeSort.cs" />
     <Compile Include="NAudio\Utils\NativeMethods.cs" />
     <Compile Include="NAudio\Utils\WavePositionExtensions.cs" />
-    <Compile Include="NAudio\Wave\Compression\AcmDriver.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmDriverAddFlags.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmDriverDetails.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmDriverDetailsSupportFlags.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmDriverEnumFlags.cs" />
-    <Compile Include="NAudio\Wave\Compression\AcmFormat.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmFormatChoose.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmFormatChooseStyleFlags.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmFormatDetails.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmFormatEnumFlags.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmFormatSuggestFlags.cs" />
-    <Compile Include="NAudio\Wave\Compression\AcmFormatTag.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmFormatTagDetails.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmInterop.cs" />
     <Compile Include="NAudio\Wave\Compression\AcmMetrics.cs" />
@@ -323,6 +324,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="libmp3lame.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="NAudio\Codecs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
