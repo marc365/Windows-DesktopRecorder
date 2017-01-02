@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-//using NAudio.Codecs;
 using NAudio.Lame;
 using NAudio.Wave;
 using System;
