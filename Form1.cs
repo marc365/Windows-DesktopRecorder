@@ -49,7 +49,7 @@ namespace DesktopRecorder
         private static int _bits = 32;
         private static int _channels = mx.WaveFormat.Channels;
         private static int _mode = 1;
-        private static string[] _modes = { "16-bit Wav","32-bit Wav","Mp3@32 kbps","Mp3@64 kbps","Mp3@128 kbps","Mp3@256 kbps" };
+        private static string[] _modes = { "16-bit wav","32-bit float wav","Mp3@32 kbps","Mp3@64 kbps","Mp3@128 kbps","Mp3@256 kbps" };
         private static Stream stdout;
 
         private bool _REC = false;
