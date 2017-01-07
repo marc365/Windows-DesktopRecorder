@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DesktopRecorder")]
 [assembly: AssemblyDescription("Desktop Audio Recorder")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("https://github.com/marc365")]
 [assembly: AssemblyProduct("DesktopRecorder")]
 [assembly: AssemblyCopyright("Copyright © 2017 Marc Williams")]
 [assembly: AssemblyTrademark("")]
