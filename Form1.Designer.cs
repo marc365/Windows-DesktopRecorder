@@ -75,7 +75,7 @@ namespace DesktopRecorder
             // 
             this.button1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("button1.BackgroundImage")));
             this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
-            this.button1.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button1.Cursor = System.Windows.Forms.Cursors.Default;
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button1.ForeColor = System.Drawing.SystemColors.Control;
             this.button1.Location = new System.Drawing.Point(9, 35);
@@ -88,7 +88,7 @@ namespace DesktopRecorder
             // 
             // button2
             // 
-            this.button2.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.button2.Cursor = System.Windows.Forms.Cursors.Default;
             this.button2.Location = new System.Drawing.Point(272, 60);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(24, 23);
