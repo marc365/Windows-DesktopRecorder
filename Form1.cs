@@ -70,7 +70,15 @@ namespace DesktopRecorder
         public Form1()
         {
             InitializeComponent();
+        }
 
+        /// <summary>
+        /// Called when starting
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_Load(object sender, EventArgs e)
+        {
             //set the callbacks
             mx.DataAvailable += new EventHandler<WaveInEventArgs>(SoundChannel_DataAvailable);
             mx.RecordingStopped += new EventHandler<StoppedEventArgs>(SoundChannel_RecordingStopped);
@@ -137,6 +145,16 @@ namespace DesktopRecorder
         }
 
         /// <summary>
+        /// Called when quiting
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            NativeMethods.FreeLibrary(mp3lib);
+        }
+
+        /// <summary>
         /// Change modes
         /// </summary>
         private void ModeSwap()
@@ -195,14 +213,14 @@ namespace DesktopRecorder
 
                 stdout.Close();
 
-                if (_mode < 1)
+                if (_mode < 2)
                 {
                     // set the time duration in the Wav header now that we're complete
                     stdout = File.Open(textBox1.Text, FileMode.Open);
                     stdout.Position = 4;
-                    stdout.Write(Encoding.ASCII.GetBytes((stdout.Length - 8).ToString()), 0, 4);
+                    stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 8), 0, 4);
                     stdout.Position = 40;
-                    stdout.Write(Encoding.ASCII.GetBytes((stdout.Length - 44).ToString()), 0, 4);
+                    stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 44), 0, 4);
                     stdout.Close();
                 }
 
@@ -318,23 +336,13 @@ namespace DesktopRecorder
             dialog = new SaveFileDialog()
             {
                 Title = "Save As",
-                Filter = _mode == 1 ? "wav files (*.wav)|*.wav|All files (*.*)|*.*" : "mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*"
+                Filter = _mode <2 ? "wav files (*.wav)|*.wav|All files (*.*)|*.*" : "mp3 files (*.mp3)|*.mp3|All files (*.*)|*.*"
             };
 
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 textBox1.Text = dialog.FileName;
             }
-        }
-
-        /// <summary>
-        /// Quit
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void button3_Click(object sender, EventArgs e)
-        {
-            System.Environment.Exit(0);
         }
 
         /// <summary>
@@ -402,16 +410,6 @@ namespace DesktopRecorder
         }
 
         /// <summary>
-        /// Called when quiting
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            NativeMethods.FreeLibrary(mp3lib);
-        }
-
-        /// <summary>
         /// Creates a Wav file header
         /// </summary>
         /// <param name="stream"></param>
@@ -471,41 +469,5 @@ namespace DesktopRecorder
             stream.Write(BitConverter.GetBytes((bitDepth / 8) * totalSampleCount), 0, 4);
         }
 
-        /// <summary>
-        /// Link to authors website
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void label1_Click(object sender, EventArgs e)
-        {
-            result = MessageBox.Show("https://github.com/marc365/Windows-DesktopRecorder", "For updates visit:", MessageBoxButtons.OK);
-        }
-
-        /// <summary>
-        /// Magic functions into the Windows Gui
-        /// enables draging the boarderless window and creates a drop shadow effect
-        /// </summary>
-        /// <param name="m"></param>
-        protected override void WndProc(ref Message m)
-        {
-            base.WndProc(ref m);
-            if (m.Msg == WM_NCHITTEST)
-                m.Result = (IntPtr)(HT_CAPTION);
-        }
-        private const int WM_NCHITTEST = 0x84;
-        private const int HT_CLIENT = 0x1;
-        private const int HT_CAPTION = 0x2;
-        private const int CS_DROPSHADOW = 0x00020000;
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                // add the drop shadow flag for automatically drawing
-                // a drop shadow around the form
-                CreateParams cp = base.CreateParams;
-                cp.ClassStyle |= CS_DROPSHADOW;
-                return cp;
-            }
-        }
     }
 }
