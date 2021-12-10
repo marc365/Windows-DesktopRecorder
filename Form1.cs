@@ -49,21 +49,27 @@ namespace DesktopRecorder
         private static int _bits = 32;
         private static int _channels = mx.WaveFormat.Channels;
         private static int _mode = 1;
-        private static string[] _modes = { "16-bit wav","32-bit float wav","Mp3@32 kbps","Mp3@64 kbps","Mp3@128 kbps","Mp3@256 kbps" };
+        private static string[] _modes = { "16-bit wav","32-bit float wav","Mp3@32 kbps","Mp3@64 kbps","Mp3@128 kbps","Mp3@256 kbps","Mp3@320 kbps" };
         private static Stream stdout;
+        private FileMode _FILEMODE = FileMode.Create;
+        private string filename;
 
         private bool _REC = false;
+        private bool restart;
+        private bool exit;
 
         internal RegistryKey registry;
         private readonly string _regKey = "DesktopRecorder";
         private readonly string _regFile = "file";
         private readonly string _regMode = "mode";
+        private readonly string _regDate = "date";
         private readonly string DisplayMember = "Name";
         private readonly string ValueMember = "Id";
-        private static SaveFileDialog dialog;
-        private static DialogResult result;
-        private FileMode _FILEMODE = FileMode.Create;
 
+        private Form2 form2;
+        private SaveFileDialog dialog;
+        private DialogResult result;
+        
         /// <summary>
         /// Initializer
         /// </summary>
@@ -79,6 +85,9 @@ namespace DesktopRecorder
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
+            //load the custom dialog
+            form2 = new Form2();
+
             //set the callbacks
             mx.DataAvailable += new EventHandler<WaveInEventArgs>(SoundChannel_DataAvailable);
             mx.RecordingStopped += new EventHandler<StoppedEventArgs>(SoundChannel_RecordingStopped);
@@ -138,10 +147,6 @@ namespace DesktopRecorder
                 { }
             }
             mp3lib = NativeMethods.LoadLibrary(libdir);
-            if (mp3lib == IntPtr.Zero)
-            {
-                result = MessageBox.Show("Cannot load Lame Mp3 Library (libmp3lame.dll)", "Error", MessageBoxButtons.OK);
-            }
         }
 
         /// <summary>
@@ -151,7 +156,15 @@ namespace DesktopRecorder
         /// <param name="e"></param>
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            NativeMethods.FreeLibrary(mp3lib);
+            if (_REC)
+            {
+                exit = true;
+                mx.StopRecording();
+            }
+            else
+            {
+                NativeMethods.FreeLibrary(mp3lib);
+            }
         }
 
         /// <summary>
@@ -183,6 +196,10 @@ namespace DesktopRecorder
                     _bits = 16;
                     _bitrate = 256;
                     break;
+                case 6:
+                    _bits = 16;
+                    _bitrate = 320;
+                    break;
                 default:
                     break;
             }
@@ -209,27 +226,8 @@ namespace DesktopRecorder
             {
                 mx.StopRecording();
 
-                Mp3Writer = null;
-
-                stdout.Close();
-
-                if (_mode < 2)
-                {
-                    // set the time duration in the Wav header now that we're complete
-                    stdout = File.Open(textBox1.Text, FileMode.Open);
-                    stdout.Position = 4;
-                    stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 8), 0, 4);
-                    stdout.Position = 40;
-                    stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 44), 0, 4);
-                    stdout.Close();
-                }
-
                 this.BackColor = System.Drawing.Color.WhiteSmoke;
-
-                // Reset to opposite
                 button1.Text = "Record";
-                // Not recording
-                _REC = false;
             }
             // Toggle Start
             else
@@ -240,55 +238,63 @@ namespace DesktopRecorder
                 registry.SetValue(_regMode, _mode);
                 registry.Close();
 
-                if (textBox1.Text == string.Empty)
+                if (string.IsNullOrEmpty(textBox1.Text))
                 {
-                    result = MessageBox.Show("File not specified", "Error", MessageBoxButtons.OK);
-                    return;
+                    button2_Click(sender, e);
                 }
 
-                if (File.Exists(textBox1.Text))
-                {
-                    result = MessageBox.Show(string.Format("Yes to Overwrite the file.{0}No to carry on recording at the end of the file{0}Cancel to not start recording", Environment.NewLine), "Overwrite the existing file?", MessageBoxButtons.YesNoCancel);
+                filename = textBox1.Text;
 
-                    if (result.ToString() == "Yes")
+                if (checkBox1.Checked)
+                {
+                    filename = filename.Substring(0, filename.Length-4) + DateTime.Now.ToString(" yyyy-MM-dd hh-mm-ss") + filename.Substring(filename.Length -4,4);
+                }
+
+                if (File.Exists(filename))
+                {
+                    if (checkBox1.Checked)
                     {
                         _FILEMODE = FileMode.Create;
                     }
-                    else if (result.ToString() == "No")
+                    else
                     {
-                        _FILEMODE = FileMode.Append;
-                    }
-                    else if (result.ToString() == "Cancel")
-                    {
-                        return;
+                        result = form2.ShowDialog();
+
+                        if (form2.Result == "Overwrite")
+                        {
+                            _FILEMODE = FileMode.Create;
+                        }
+                        else if (form2.Result == "Append")
+                        {
+                            _FILEMODE = FileMode.Append;
+                        }
+                        else if (form2.Result == "Cancel")
+                        {
+                            return;
+                        }
                     }
                 }
+
                 try
                 {
-                    stdout = File.Open(textBox1.Text, _FILEMODE);
+                    stdout = File.Open(filename, _FILEMODE);
                 }
                 catch(Exception exc)
                 {
-                    result = MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK);
+                    result = MessageBox.Show(exc.Message, "File Error", MessageBoxButtons.OK);
                     return;
                 }
 
                 //Mp3 encoding with libmp3lame.dll
                 if (_mode>1)
                 {
-                    if (mp3lib == IntPtr.Zero)
-                    {
-                        result = MessageBox.Show("Cannot load Lame Mp3 Library (libmp3lame.dll)", "Error", MessageBoxButtons.OK);
-                        return;
-                    }
-
                     try
                     {
                         Mp3Writer = new LameMP3FileWriter(stdout, new WaveFormat(_rate, _bits, _channels), _bitrate);
                     }
                     catch (ArgumentException exc)
                     {
-                        result = MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK);
+                        result = MessageBox.Show(exc.Message, "Mp3 Error", MessageBoxButtons.OK);
                         stdout.Close();
 
                         return;
@@ -302,7 +308,7 @@ namespace DesktopRecorder
                     }
                     catch (Exception exc)
                     {
-                        result = MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK);
+                        result = MessageBox.Show(exc.Message, "Header Error", MessageBoxButtons.OK);
                         stdout.Close();
                         return;
                     }
@@ -314,7 +320,7 @@ namespace DesktopRecorder
                 }
                 catch (Exception exc)
                 {
-                    result = MessageBox.Show(exc.Message, "Error", MessageBoxButtons.OK);
+                    result = MessageBox.Show(exc.Message, "Recording Error", MessageBoxButtons.OK);
                     stdout.Close();
                     return;
                 }
@@ -342,6 +348,12 @@ namespace DesktopRecorder
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 textBox1.Text = dialog.FileName;
+                if (_REC)
+                {
+                    restart = true;
+                    mx.StopRecording();
+                }
+
             }
         }
 
@@ -361,7 +373,7 @@ namespace DesktopRecorder
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        public static void SoundChannel_DataAvailable(object sender, WaveInEventArgs e)
+        public void SoundChannel_DataAvailable(object sender, WaveInEventArgs e)
         {
             sourceWaveBuffer = new WaveBuffer(e.Buffer);
 
@@ -399,14 +411,37 @@ namespace DesktopRecorder
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void SoundChannel_RecordingStopped(object sender, StoppedEventArgs e)
+        private void SoundChannel_RecordingStopped(object sender, StoppedEventArgs e)
         {
-            //if (mx != null)
-            //{
-            //    mx.Dispose();
-            //}
-            //Console.Error.WriteLine(e.Exception);
-            //System.Environment.Exit(0);
+            Mp3Writer = null;
+
+            stdout.Close();
+
+            if (_mode < 2)
+            {
+                // set the time duration in the Wav header now that we're complete
+                stdout = File.Open(filename, FileMode.Open);
+                stdout.Position = 4;
+                stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 8), 0, 4);
+                stdout.Position = 40;
+                stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 44), 0, 4);
+                stdout.Close();
+            }
+
+            _REC = false;
+
+            if (restart)
+            {
+                restart = false;
+                button1_Click(sender, e);
+            }
+
+            if (exit)
+            {
+                NativeMethods.FreeLibrary(mp3lib);
+            }
+
+            if (e.Exception != null) result = MessageBox.Show(string.Format("{1}{0}{2}",Environment.NewLine, e.Exception.Message, e.Exception.StackTrace), "Recording Error", MessageBoxButtons.OK);
         }
 
         /// <summary>
