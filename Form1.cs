@@ -98,8 +98,9 @@ namespace DesktopRecorder
             registry = Registry.CurrentUser.OpenSubKey(_regKey);
             if (registry != null)
             {
-                textBox1.Text = registry.GetValue(_regFile, null).ToString();
-                _mode = int.Parse(registry.GetValue(_regMode, _mode).ToString());
+                textBox1.Text = (string)registry.GetValue(_regFile, null);
+                _mode = (int)registry.GetValue(_regMode, _mode);
+                checkBox1.Checked = bool.Parse((string)registry.GetValue(_regDate, "True"));
                 ModeSwap();
             }
 
@@ -236,6 +237,7 @@ namespace DesktopRecorder
                 registry = Registry.CurrentUser.CreateSubKey(_regKey);
                 registry.SetValue(_regFile, textBox1.Text);
                 registry.SetValue(_regMode, _mode);
+                registry.SetValue(_regDate, checkBox1.Checked);
                 registry.Close();
 
                 if (string.IsNullOrEmpty(textBox1.Text))
