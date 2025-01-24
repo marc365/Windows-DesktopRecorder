@@ -1,4 +1,4 @@
-#region MIT license
+﻿#region MIT license
 // 
 // MIT license
 //
@@ -25,7 +25,7 @@
 #endregion
 using Microsoft.Win32;
 using NAudio.Lame;
-using NAudio.Wave;
+using NAudio;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -41,7 +41,7 @@ namespace DesktopRecorder
 {
     public partial class Form1 : Form
     {    
-        private static WasapiLoopbackCapture mx = new WasapiLoopbackCapture();
+        private static WasapiLoopbackCapture mx;
         private static WaveBuffer sourceWaveBuffer;
         private static WaveBuffer destWaveBuffer;
 
@@ -51,10 +51,10 @@ namespace DesktopRecorder
         private static string libdir;
         private static int _bitrate = 256;
 
-        private static int _rate = mx.WaveFormat.SampleRate;
-        private static int _bits = 32;
-        private static int _channels = mx.WaveFormat.Channels;
-        private static int _mode = 1;
+        private static int _rate;
+        private static int _bits;
+        private static int _channels;
+        private static int _mode;
         private readonly string[] _modes = { "16-bit wav","32-bit wav","32 kbps mp3","64 kbps mp3","128 kbps mp3","256 kbps mp3","320 kbps mp3" };
         private static int _output = 0;
         private readonly string[] _outputs = { "File", "Stream" };
@@ -95,6 +95,21 @@ namespace DesktopRecorder
         /// </summary>
         public Form1()
         {
+            //associate with the active audio device
+            try
+            {
+                mx = new WasapiLoopbackCapture();
+                _rate = mx.WaveFormat.SampleRate;
+                _bits = 32;
+                _channels = mx.WaveFormat.Channels;
+                _mode = 1;
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "Device Error", MessageBoxButtons.OK);
+                Environment.Exit(exc.HResult);
+            }
+
             InitializeComponent();
             update = UpdateTimer;
             reset = ResetView;            

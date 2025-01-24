@@ -27,7 +27,7 @@ using System;
 using System.IO;
 using System.Runtime.InteropServices;
 using NAudio.Lame.DLL;
-using NAudio.Wave;
+using NAudio;
 
 namespace NAudio.Lame
 {
