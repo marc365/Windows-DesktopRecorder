@@ -2,7 +2,7 @@
 // 
 // MIT license
 //
-// Copyright (c) 2017-2023 Marc Williams
+// Copyright (c) 2017-2025 Marc Williams
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,6 @@
 // 
 #endregion
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DesktopRecorder
