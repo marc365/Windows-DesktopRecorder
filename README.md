@@ -1,7 +1,7 @@
 # Desktop Audio Loopback Recorder Ripper Copyright (C) 2017-2025 Marc Williams
 
 ## 32-bit Floating Point 16-bit CD Quality WAV & MP3 Encoding with L.A.M.E.
-## Record what the sound mixer is playing to file or stream via http(s)
+### Record what the sound mixer is playing to file or stream via http(s)
 
 * Easy installation: copy the unzipped exe to 'C:\Program Files\' and create a desktop shortcut
 * Registry settings: Computer\\HKEY_CURRENT_USER\\Software\\DesktopRecorder
@@ -28,6 +28,6 @@
 ![alt desktop recorder stream](https://github.com/marc365/Windows-DesktopRecorder/raw/master/DesktopRecorderStream.PNG)
 
 * Windows Vista CoreAudio AudioClient Copyright (C) 2007 Ray Molenkamp
-* NAudio library by Mark Heath Copyright (C) 2001-2013 Mark Heath
+* NAudio library Copyright (C) 2001-2013 Mark Heath
 * LibMp3Lame.NativeMethods Copyright (C) 2013 Corey Murtagh
 * L.A.M.E. MP3 Encoder 3.99.2.5 Copyright (C) 1999-2011 The L.A.M.E. Team

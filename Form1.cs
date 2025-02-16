@@ -27,7 +27,6 @@ using Microsoft.Win32;
 using NAudio;
 using NAudio.Lame;
 using System;
-using System.Collections;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -168,6 +167,7 @@ namespace DesktopRecorder
             Width = _width;
             Height = _height;
 
+            //view modes
             OutputSwap(); //close registry
             ModeSwap();
             ResetView();
@@ -647,7 +647,7 @@ namespace DesktopRecorder
             comboBox2.Enabled = false;
 
             BackColor = Color.DarkRed;
-            button1.FlatAppearance.BorderColor = Color.DarkRed;
+            button1.FlatAppearance.BorderColor = BackColor;
             button1.Text = _button_stop;
             recording = true;            
         }
@@ -853,8 +853,7 @@ namespace DesktopRecorder
             else if (!restart)
             {
                 Invoke(load);
-                registry.Close();
-                Invoke(output);
+                Invoke(output); //close registry
                 Invoke(reset);
             }
             else
@@ -1015,13 +1014,13 @@ namespace DesktopRecorder
             {
                 LoadRegistryUI();
             }
-            _width = (int)registry.GetValue(Reg.Width, 408); //140
-            _height = (int)registry.GetValue(Reg.Height, 121); //158 //111
+            _width = (int)registry.GetValue(Reg.Width, 408); //legacy size
+            _height = (int)registry.GetValue(Reg.Height, 121); //legacy size
             _left = (int)registry.GetValue(Reg.Left, 0);
             _top = (int)registry.GetValue(Reg.Top, 0);
             while (true)
             {
-                _button_start = Def.Space + (string)registry.GetValue(Reg.ButtonStart); //alignment
+                _button_start = Def.Space + (string)registry.GetValue(Reg.ButtonStart); //space alignment
                 if (_button_start != Def.Space)
                 {
                     break;
@@ -1031,7 +1030,7 @@ namespace DesktopRecorder
             }
             while (true)
             {
-                _button_stop = Def.Space + (string)registry.GetValue(Reg.ButtonStop); //alignment
+                _button_stop = Def.Space + (string)registry.GetValue(Reg.ButtonStop); //space alignment
                 if (_button_stop != Def.Space)
                 {
                     break;
@@ -1141,8 +1140,7 @@ namespace DesktopRecorder
                             registry.DeleteValue(Reg.HotSwap);
                             HotSwap();
                         }
-                        registry.Close();
-                        Invoke(output);
+                        Invoke(output); //close registry
                         Invoke(mode);
                         switch (msg)
                         {
