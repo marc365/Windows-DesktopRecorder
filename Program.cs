@@ -97,6 +97,9 @@ namespace DesktopRecorder
             Application.Run(new Form1());
         }
 
+        /// <summary>
+        /// Find an existing desktop recorder instance
+        /// </summary>
         private static void TryPipe(string arg)
         {
             using (NamedPipeClientStream pipe = new NamedPipeClientStream(Def.PipeName))
@@ -115,6 +118,7 @@ namespace DesktopRecorder
                     }
                     return;
                 }
+                //command line remote control
                 if (pipe.ReadByte() == 1)
                 {
                     switch (arg)

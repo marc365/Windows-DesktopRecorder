@@ -55,6 +55,7 @@ namespace DesktopRecorder
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
@@ -76,6 +77,7 @@ namespace DesktopRecorder
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.checkBox5 = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -91,6 +93,7 @@ namespace DesktopRecorder
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(1, 20);
             this.textBox1.TabIndex = 1;
+            this.toolTip1.SetToolTip(this.textBox1, "File name");
             // 
             // button1
             // 
@@ -107,6 +110,7 @@ namespace DesktopRecorder
             this.button1.Padding = new System.Windows.Forms.Padding(0, 0, 2, 2);
             this.button1.Size = new System.Drawing.Size(123, 119);
             this.button1.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.button1, "One click Record & Stop");
             this.button1.UseVisualStyleBackColor = false;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
@@ -118,6 +122,7 @@ namespace DesktopRecorder
             this.button2.Size = new System.Drawing.Size(24, 21);
             this.button2.TabIndex = 3;
             this.button2.Text = "...";
+            this.toolTip1.SetToolTip(this.button2, "Open the file selector");
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -129,6 +134,7 @@ namespace DesktopRecorder
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(90, 21);
             this.comboBox2.TabIndex = 9;
+            this.toolTip1.SetToolTip(this.comboBox2, "Select output type");
             this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
             // 
             // checkBox1
@@ -139,6 +145,7 @@ namespace DesktopRecorder
             this.checkBox1.Size = new System.Drawing.Size(49, 17);
             this.checkBox1.TabIndex = 10;
             this.checkBox1.Text = "Date";
+            this.toolTip1.SetToolTip(this.checkBox1, "Add the date to the file name");
             // 
             // comboBox1
             // 
@@ -148,6 +155,7 @@ namespace DesktopRecorder
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(56, 21);
             this.comboBox1.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.comboBox1, "Select output destination");
             this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // checkBox2
@@ -158,6 +166,7 @@ namespace DesktopRecorder
             this.checkBox2.Size = new System.Drawing.Size(71, 17);
             this.checkBox2.TabIndex = 12;
             this.checkBox2.Text = "Overwrite";
+            this.toolTip1.SetToolTip(this.checkBox2, "Overwrite the file");
             // 
             // label1
             // 
@@ -172,6 +181,7 @@ namespace DesktopRecorder
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(0, 24);
             this.label1.TabIndex = 13;
+            this.toolTip1.SetToolTip(this.label1, "Recording time (click to reset)");
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // radioButton1
@@ -182,6 +192,7 @@ namespace DesktopRecorder
             this.radioButton1.Size = new System.Drawing.Size(42, 17);
             this.radioButton1.TabIndex = 14;
             this.radioButton1.Text = "Get";
+            this.toolTip1.SetToolTip(this.radioButton1, "HTTP GET");
             this.radioButton1.CheckedChanged += new System.EventHandler(this.radioButton1_CheckedChanged);
             // 
             // radioButton2
@@ -192,6 +203,7 @@ namespace DesktopRecorder
             this.radioButton2.Size = new System.Drawing.Size(46, 17);
             this.radioButton2.TabIndex = 15;
             this.radioButton2.Text = "Post";
+            this.toolTip1.SetToolTip(this.radioButton2, "HTTP POST");
             this.radioButton2.CheckedChanged += new System.EventHandler(this.radioButton2_CheckedChanged);
             // 
             // radioButton3
@@ -202,6 +214,7 @@ namespace DesktopRecorder
             this.radioButton3.Size = new System.Drawing.Size(41, 17);
             this.radioButton3.TabIndex = 16;
             this.radioButton3.Text = "Put";
+            this.toolTip1.SetToolTip(this.radioButton3, "HTTP PUT");
             this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
             // 
             // checkBox3
@@ -212,6 +225,7 @@ namespace DesktopRecorder
             this.checkBox3.Size = new System.Drawing.Size(63, 17);
             this.checkBox3.TabIndex = 17;
             this.checkBox3.Text = "Append";
+            this.toolTip1.SetToolTip(this.checkBox3, "Start recording from the end of the file ");
             this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
             // tableLayoutPanel1
@@ -326,6 +340,7 @@ namespace DesktopRecorder
             this.checkBox4.Size = new System.Drawing.Size(45, 17);
             this.checkBox4.TabIndex = 22;
             this.checkBox4.Text = "Top";
+            this.toolTip1.SetToolTip(this.checkBox4, "Keep the window on top");
             this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
             // 
             // checkBox5
@@ -338,6 +353,7 @@ namespace DesktopRecorder
             this.checkBox5.Size = new System.Drawing.Size(72, 17);
             this.checkBox5.TabIndex = 23;
             this.checkBox5.Text = "Minimized";
+            this.toolTip1.SetToolTip(this.checkBox5, "Start minimized");
             // 
             // Form1
             // 
@@ -398,6 +414,7 @@ namespace DesktopRecorder
         private FlowLayoutPanel flowLayoutPanel2;
         private CheckBox checkBox4;
         private CheckBox checkBox5;
+        private ToolTip toolTip1;
     }
 }
 

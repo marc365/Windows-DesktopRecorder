@@ -78,6 +78,7 @@ namespace DesktopRecorder
         private int _height;
         private int _left;
         private int _top;
+        private int _update;
         private string _time;
         private string _button_start;
         private string _button_stop;
@@ -284,6 +285,7 @@ namespace DesktopRecorder
             }
             if (recording)
             {
+                recording = false;
                 exit = true;
                 mx.StopRecording();
             }
@@ -411,7 +413,9 @@ namespace DesktopRecorder
         }
 
         /// <summary>
-        /// Show the recording time
+        /// Format the recording time and
+        /// change the form border style 
+        /// based on the width of the window
         /// </summary>
         private void UpdateTimer()
         {
@@ -422,6 +426,28 @@ namespace DesktopRecorder
             else if (_width < Def.ShortTimeWidth - nudge) { _time = Timer.Elapsed.ToString(Def.ShortStamp); FormBorderStyle = FormBorderStyle.Sizable; }
             else { _time = Timer.Elapsed.ToString(Def.TimeStamp); FormBorderStyle = FormBorderStyle.Sizable; }
             if (_time != label1.Text) label1.Text = _time;
+        }
+
+        /// <summary>
+        /// Run the timer update from a background thread
+        /// </summary>
+        private void BackgroundTimer()
+        {
+            while (recording)
+            {
+                if ( _width > Def.ShortWidth)
+                {
+                    try
+                    {
+                        Invoke(update);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        //Object disposed exception
+                    }
+                }
+                Thread.Sleep(_update);                
+            }
         }
 
         /// <summary>
@@ -649,7 +675,9 @@ namespace DesktopRecorder
             BackColor = Color.DarkRed;
             button1.FlatAppearance.BorderColor = BackColor;
             button1.Text = _button_stop;
-            recording = true;            
+            recording = true;
+
+            new Thread(BackgroundTimer).Start();
         }
 
         /// <summary>
@@ -786,7 +814,7 @@ namespace DesktopRecorder
                 for (int sample = 0; sample < sourceSamples; sample++)
                 {
                     float sample32 = source.FloatBuffer[sample];
-                    dest.ShortBuffer[destOffset++] = (short)(sample32 * 32767);
+                    dest.ShortBuffer[destOffset++] = (short)(sample32 * short.MaxValue);
                 }
 
                 if (_mode == 0) //16-bit wav
@@ -798,8 +826,6 @@ namespace DesktopRecorder
                     mp3writer.Write(to16, 0, destOffset * 2);
                 }
             }
-
-            Invoke(update);
         }
 
         /// <summary>
@@ -1003,6 +1029,11 @@ namespace DesktopRecorder
 
         #region Registry
 
+        //Computer\\HKEY_CURRENT_USER\\Software\\DesktopRecorder
+
+        /// <summary>
+        /// Load the settings from the registry
+        /// </summary>
         private void LoadRegistry()
         {
             registry = Registry.CurrentUser.OpenSubKey(Reg.KEY);
@@ -1018,9 +1049,10 @@ namespace DesktopRecorder
             _height = (int)registry.GetValue(Reg.Height, 121); //legacy size
             _left = (int)registry.GetValue(Reg.Left, 0);
             _top = (int)registry.GetValue(Reg.Top, 0);
+            _update = (int)registry.GetValue(Reg.UpdateFrequency, 83); //12 fps
             while (true)
             {
-                _button_start = Def.Space + (string)registry.GetValue(Reg.ButtonStart); //space alignment
+                _button_start = Def.Space + (string)registry.GetValue(Reg.ButtonStart); //space character for alignment
                 if (_button_start != Def.Space)
                 {
                     break;
@@ -1030,7 +1062,7 @@ namespace DesktopRecorder
             }
             while (true)
             {
-                _button_stop = Def.Space + (string)registry.GetValue(Reg.ButtonStop); //space alignment
+                _button_stop = Def.Space + (string)registry.GetValue(Reg.ButtonStop); //space character for alignment
                 if (_button_stop != Def.Space)
                 {
                     break;
@@ -1052,6 +1084,9 @@ namespace DesktopRecorder
             base.TopMost = bool.Parse(ontop);
         }
 
+        /// <summary>
+        /// Load UI state from the registry and set minimized
+        /// </summary>
         private void LoadRegistryUI()
         {
             checkBox1.Checked = bool.Parse((string)registry.GetValue(Reg.Date, Def.False));
@@ -1090,6 +1125,9 @@ namespace DesktopRecorder
             }
         }
 
+        /// <summary>
+        /// Save all settings to the registry
+        /// </summary>
         private void SaveRegistry()
         {
             registry = Registry.CurrentUser.CreateSubKey(Reg.KEY);
@@ -1114,6 +1152,7 @@ namespace DesktopRecorder
             registry.SetValue(Reg.Height, _height);
             registry.SetValue(Reg.Left, _left);
             registry.SetValue(Reg.Top, _top);
+            registry.SetValue(Reg.UpdateFrequency, _update);
             registry.Close();
         }
 
@@ -1121,6 +1160,9 @@ namespace DesktopRecorder
 
         #region IPC
         
+        /// <summary>
+        /// Inter-process communication server
+        /// </summary>
         private void PipeServer()
         {
             while (remote)
@@ -1142,6 +1184,7 @@ namespace DesktopRecorder
                         }
                         Invoke(output); //close registry
                         Invoke(mode);
+                        //command line remote control
                         switch (msg)
                         {
                             case 1: //handshake
