@@ -56,12 +56,13 @@ namespace DesktopRecorder
         private TcpClient tcp;
         private Stopwatch Timer;
         private SaveFileDialog dialog;
-        private MethodInvoker update;
-        private MethodInvoker reset;
-        private MethodInvoker click;
-        private MethodInvoker output;
-        private MethodInvoker mode;
-        private MethodInvoker load;
+        private MethodInvoker updateTimer;
+        private MethodInvoker resetView;
+        private MethodInvoker button1Click;
+        private MethodInvoker outputSwap;
+        private MethodInvoker modeSwap;
+        private MethodInvoker loadRegistry;
+        private MethodInvoker closeForm;
         private Thread pipe;
 
         private int _rate;
@@ -78,54 +79,34 @@ namespace DesktopRecorder
         private int _height;
         private int _left;
         private int _top;
+        private int _deltax;
+        private int _deltay;
         private int _update;
         private string _time;
         private string _button_start;
         private string _button_stop;
+        private bool _transparent;
         private FileMode _filemode = FileMode.Create;
 
         private bool recording;
         private bool restart;
+        private bool recover;
         private bool exit;
         private bool remote;
         private bool minimized;
         private bool small;
-
+        private bool drag;
+        private bool cancel;
+        private bool tiny;
+        private bool userRequestStop;
+        
         /// <summary>
         /// Initializer
         /// </summary>
-        public Form1()
+        internal Form1()
         {
-            //associate with the active audio device
-            try
-            {
-                mx = new WasapiLoopbackCapture();
-                _rate = mx.WaveFormat.SampleRate;
-                _bits = 32;
-                _channels = mx.WaveFormat.Channels;
-            }
-            catch (Exception exc)
-            {
-                MessageBox.Show(exc.Message, Error.Device, MessageBoxButtons.OK);
-                Environment.Exit(exc.HResult);
-            }
-
             //remote control
-            using (NamedPipeClientStream instance = new NamedPipeClientStream(Def.PipeName))
-            {
-                try
-                {
-                    instance.Connect(0);
-                    instance.ReadByte();
-                    pipe = null;
-                }
-                catch (TimeoutException) //nothing found 
-                {
-                    //only first instance running can be remote controlled
-                    remote = true;
-                    pipe = new Thread(PipeServer);
-                }
-            }
+            InitIPC();
 
             //load the settings
             LoadRegistry();
@@ -137,12 +118,16 @@ namespace DesktopRecorder
             InitializeComponent();
             
             //method invokers
-            update = UpdateTimer;
-            reset = ResetView;
-            click = button1_Invoke;
-            output = OutputSwap;
-            mode = ModeSwap;
-            load = LoadRegistry;
+            updateTimer = UpdateTimer;
+            resetView = ResetView;
+            button1Click = button1_Invoke;
+            outputSwap = OutputSwap;
+            modeSwap = ModeSwap;
+            loadRegistry = LoadRegistry;
+            closeForm = FormClosing_Invoke;
+
+            //set timer
+            Timer = new Stopwatch();
         }
 
         #endregion
@@ -154,13 +139,6 @@ namespace DesktopRecorder
         /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
-            //set the callbacks
-            mx.DataAvailable += new EventHandler<WaveInEventArgs>(SoundChannel_DataAvailable);
-            mx.RecordingStopped += new EventHandler<StoppedEventArgs>(SoundChannel_RecordingStopped);
-
-            //set timer
-            Timer = new Stopwatch();
-
             //load the UI settings
             LoadRegistryUI();
 
@@ -172,6 +150,7 @@ namespace DesktopRecorder
             OutputSwap(); //close registry
             ModeSwap();
             ResetView();
+            if (_height >= Def.ToggleHeight) small = false;
             ButtonSwap();
 
             //output modes
@@ -196,7 +175,7 @@ namespace DesktopRecorder
             //extract embedded resource to the Temp folder and load
             string libdir = Path.GetTempPath();
             try
-            {                
+            {
                 if (!Directory.Exists(libdir))
                 {
                     Directory.CreateDirectory(libdir);
@@ -208,7 +187,7 @@ namespace DesktopRecorder
                 Environment.Exit(exc.HResult);
             }
             libdir = Path.Combine(libdir, Def.LameDll);
-            if (!File.Exists(libdir)) using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("DesktopRecorder.libmp3lame.dll"))
+            if (!File.Exists(libdir)) using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(Def.LameResource))
             {
                 try
                 {
@@ -246,27 +225,41 @@ namespace DesktopRecorder
                 ButtonSwap();
             }
             if (pipe != null) pipe.Start();
-            if (Program.AutoStart) Invoke(click);
             ResetTimer();
+            BorderSwap();
+            if (!_transparent)
+            {
+                tableLayoutPanel2.Visible = true;
+                SetTransparencyColour(Color.WhiteSmoke);
+                TransparencyKey = default(Color);
+            }
+            else
+            {
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                if (Width == Def.MinWidth) tableLayoutPanel2.Visible = false;
+                SetTransparencyColour(Color.Black);
+                TransparencyKey = BackColor;
+            }
+            if (Program.AutoStart) Invoke(button1Click);
         }
 
         /// <summary>
-        /// Called after resizing window
+        /// Called after resizing or moving window (not called when using drag button)
         /// </summary>
         private void Form1_Resized(object sender, EventArgs e)
         {
-            if (Form.ActiveForm != null)
-            {
-                _width = Width;
-                _height = Height;
-                _left = Left;
-                _top = Top;
+            _width = Width;
+            _height = Height;
+            _left = Left;
+            _top = Top;
 
-                ButtonSwap();
+            ButtonSwap();
 
-                SaveRegistry();
-                UpdateTimer();
-            }
+            SaveRegistry();
+
+            UpdateTimer();
+            BorderSwap();
+            if (tableLayoutPanel2.Visible == false) tableLayoutPanel2.Visible = true;
         }
 
         /// <summary>
@@ -274,15 +267,8 @@ namespace DesktopRecorder
         /// </summary>
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (pipe != null)
-            {
-                remote = false;                
-                using (NamedPipeClientStream instance = new NamedPipeClientStream(Def.PipeName)) //connecting to close 
-                {
-                    instance.Connect(0);
-                    instance.ReadByte();
-                }
-            }
+            SaveRegistry();
+
             if (recording)
             {
                 recording = false;
@@ -293,9 +279,26 @@ namespace DesktopRecorder
             {
                 NativeMethods.FreeLibrary(mp3lib);
             }
-            SaveRegistry();
+
+            if (pipe != null && remote)
+            {
+                remote = false;
+                using (NamedPipeClientStream instance = new NamedPipeClientStream(Def.PipeName)) //connecting to close 
+                {
+                    instance.Connect(0);
+                    if (instance.IsConnected) instance.ReadByte();
+                }
+            }
         }
 
+        /// <summary>
+        /// STAThread invoke
+        /// </summary>
+        private void FormClosing_Invoke()
+        {
+            Form1_FormClosing(null, null);
+        }
+        
         /// <summary>
         /// Change output
         /// </summary>
@@ -306,7 +309,8 @@ namespace DesktopRecorder
             {
                 case 0:
                     textBox1.Text = (string)registry.GetValue(Reg.File, Def.EmptyString);
-                    button2.Show();
+                    toolTip1.SetToolTip(textBox1, Title.FileName);
+                    if (!tiny) button2.Show();
                     checkBox1.Show();
                     checkBox2.Show();
                     checkBox3.Show();
@@ -316,6 +320,7 @@ namespace DesktopRecorder
                     break;
                 case 1:
                     textBox1.Text = (string)registry.GetValue(Reg.Stream, Def.Https);
+                    toolTip1.SetToolTip(textBox1, Title.StreamLocation);
                     button2.Hide();
                     checkBox1.Hide();
                     checkBox2.Hide();
@@ -332,7 +337,7 @@ namespace DesktopRecorder
         }
 
         /// <summary>
-        /// Change modes
+        /// Change audio mode
         /// </summary>
         private void ModeSwap()
         {
@@ -368,13 +373,13 @@ namespace DesktopRecorder
                     break;
             }
 
-            if (_mode<2)
+            if (_mode < 2)
             {
-                textBox1.Text = textBox1.Text.Replace(Def.Mp3, Def.Wav);
+                textBox1.Text = SwapFileExtension(textBox1.Text, Def.Wav);
             }
             else
             {
-                textBox1.Text = textBox1.Text.Replace(Def.Wav, Def.Mp3);
+                textBox1.Text = SwapFileExtension(textBox1.Text, Def.Mp3);
             }
 
             comboBox2.SelectedItem = _mode;
@@ -395,6 +400,7 @@ namespace DesktopRecorder
                 button1.Font = new System.Drawing.Font(Def.Font, 8F, FontStyle.Regular, GraphicsUnit.Point, 0);
                 checkBox4.Hide();
                 checkBox5.Hide();
+                hScrollBar1.Hide();
             }
             else if (_height >= Def.ToggleHeight)
             {
@@ -404,12 +410,132 @@ namespace DesktopRecorder
                     tableLayoutPanel1.ColumnStyles.Clear();
                     tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 124F));
                     button1.Font = new System.Drawing.Font(Def.Font, 11.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-                    checkBox4.Show();
-                    checkBox5.Show();
                 }
                 small = false;
+                checkBox4.Show();
+                checkBox5.Show();
+                hScrollBar1.Show();
             }
+            tableLayoutPanel3.Show();
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            if (_height >= Def.ToggleHeight && _width < Def.ShortWidth)
+            {
+                comboBox1.Hide();
+                textBox1.Hide();
+                hScrollBar1.Hide();
+                checkBox1.Hide();
+                checkBox2.Hide();
+                checkBox3.Hide();
+                checkBox4.Hide();
+                checkBox5.Hide();
+                tableLayoutPanel3.Hide();
+                tiny = true;
+            }
+            else if (_height >= Def.ToggleHeight && _width < Def.ToolWidth)
+            {
+                comboBox1.Hide();
+                textBox1.Hide();
+                hScrollBar1.Hide();
+                checkBox1.Hide();
+                checkBox2.Hide();
+                checkBox3.Hide();
+                checkBox4.Hide();
+                checkBox5.Hide();
+            }
+            else if (_width < Def.TinyWidth)
+            {
+                comboBox1.Hide();
+                textBox1.Hide();
+                hScrollBar1.Hide();
+                checkBox1.Hide();
+                checkBox2.Hide();
+                checkBox3.Hide();
+                tableLayoutPanel3.Hide();
+                tiny = true;
+            }
+            else if (_width < Def.ShortWidth)
+            {
+                comboBox1.Hide();
+                textBox1.Hide();
+                hScrollBar1.Hide();
+                checkBox1.Hide();
+                checkBox2.Hide();
+                checkBox3.Hide();
+            }
+            else
+            {
+                comboBox1.Show();
+                textBox1.Show();
+                checkBox1.Show();
+                checkBox2.Show();
+                checkBox3.Show();
+                tiny = false;
+            }
+
+        }
+
+        /// <summary>
+        /// Change the Window Style
+        /// </summary>
+        private void BorderSwap()
+        {
+            int nudge = 0;
+            if (_height < Def.ToggleHeight) nudge = 54;
+            if (_width < Def.ToolWidth - nudge) FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            else FormBorderStyle = FormBorderStyle.Sizable;
+        }
+
+        /// <summary>
+        /// Change the background colour when toggled
+        /// </summary>
+        private void SetTransparencyColour(Color bg)
+        {
+            BackColor = bg;
+            button1.BackColor = bg;
+            button1.FlatAppearance.BorderColor = bg;
+            button1.FlatAppearance.MouseDownBackColor = bg;
+            button1.FlatAppearance.MouseOverBackColor = bg;
+            button1.FlatAppearance.BorderSize = 0;
+        }
+
+        /// <summary>
+        /// Start drag the window by the record button
+        /// </summary>
+        private void button1_MouseDown(object sender, MouseEventArgs e)
+        {
+            drag = true;
+            _deltax = MousePosition.X - Left;
+            _deltay = MousePosition.Y - Top;
+        }
+
+        /// <summary>
+        /// Drag the window by the record button
+        /// </summary>
+        private void button1_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (drag)
+            {
+                if (Left != MousePosition.X - _deltax || Top != MousePosition.Y - _deltay)
+                {
+                    cancel = true;
+
+                    Left = MousePosition.X - _deltax;
+                    Top = MousePosition.Y - _deltay;
+
+                    _left = Left;
+                    _top = Top;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Stop drag the window by the record button
+        /// </summary>
+        private void button1_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (drag) SaveRegistry();
+            drag = false;
+            cancel = false;
         }
 
         /// <summary>
@@ -419,12 +545,7 @@ namespace DesktopRecorder
         /// </summary>
         private void UpdateTimer()
         {
-            int nudge = 0;
-            if (_height < Def.ToggleHeight) nudge = 54;
-            if (_width < Def.ToolWidth - nudge) { _time = Def.EmptyString; FormBorderStyle = FormBorderStyle.SizableToolWindow; }
-            else if (_width < Def.ShortWidth - nudge) { _time = Def.EmptyString; FormBorderStyle = FormBorderStyle.Sizable; }
-            else if (_width < Def.ShortTimeWidth - nudge) { _time = Timer.Elapsed.ToString(Def.ShortStamp); FormBorderStyle = FormBorderStyle.Sizable; }
-            else { _time = Timer.Elapsed.ToString(Def.TimeStamp); FormBorderStyle = FormBorderStyle.Sizable; }
+            _time = Timer.Elapsed.ToString(Def.TimeStamp);
             if (_time != label1.Text) label1.Text = _time;
         }
 
@@ -435,11 +556,11 @@ namespace DesktopRecorder
         {
             while (recording)
             {
-                if ( _width > Def.ShortWidth)
+                if ( _width > Def.MinWidth)
                 {
                     try
                     {
-                        Invoke(update);
+                        Invoke(updateTimer);
                     }
                     catch (InvalidOperationException)
                     {
@@ -456,7 +577,7 @@ namespace DesktopRecorder
         private void ResetTimer()
         {
             Timer.Reset();
-            Invoke(update);
+            Invoke(updateTimer);
         }
 
         /// <summary>
@@ -465,8 +586,16 @@ namespace DesktopRecorder
         private void ResetView()
         {
             Timer.Stop();
-            BackColor = Color.WhiteSmoke;
-            button1.FlatAppearance.BorderColor = BackColor;
+            if (_transparent)
+            {                
+                SetTransparencyColour(Color.Black);
+                TransparencyKey = BackColor;
+            }
+            else
+            {
+                SetTransparencyColour(Color.WhiteSmoke);
+                TransparencyKey = Color.Green;
+            }
             comboBox1.Enabled = true;
             textBox1.Enabled = true;
             comboBox2.Enabled = true;
@@ -481,15 +610,30 @@ namespace DesktopRecorder
         /// Record
         /// </summary>
         private void button1_Click(object sender, EventArgs e)
-        {
+        {            
+            if (cancel)
+            {
+                cancel = false;
+                drag = false;
+                return;
+            }
+            
             //toggle stop
             if (recording)
             {
-                mx.StopRecording();
+                try
+                {
+                    userRequestStop = true;
+                    mx.StopRecording();
+                }
+                catch (Exception exc)
+                {
+                    MessageBox.Show(exc.Message, _button_stop, MessageBoxButtons.OK);
+                }
                 return;
             }
 
-            SaveRegistry();
+            InitWasapi();
 
             #region File
 
@@ -498,6 +642,8 @@ namespace DesktopRecorder
                 if (string.IsNullOrEmpty(textBox1.Text))
                 {
                     button2_Click(sender, e);
+                    if (string.IsNullOrEmpty(textBox1.Text)) return;
+                    SaveRegistry();
                 }
 
                 _filename = textBox1.Text;
@@ -509,7 +655,7 @@ namespace DesktopRecorder
 
                 if (File.Exists(_filename))
                 {
-                    if (checkBox3.Checked)
+                    if (checkBox3.Checked || recover)
                     {
                         _filemode = FileMode.Append;
                     }
@@ -517,7 +663,7 @@ namespace DesktopRecorder
                     {
                         _filemode = FileMode.Create;
 
-                        if (!checkBox2.Checked)
+                        if (!checkBox2.Checked && !recover)
                         {
                             FileInfo file = new FileInfo(_filename);
 
@@ -527,14 +673,17 @@ namespace DesktopRecorder
                     }
                 }
 
-                try
+                if (!recover)
                 {
-                    stdout = File.Open(_filename, _filemode);
-                }
-                catch (Exception exc)
-                {
-                    MessageBox.Show(exc.Message, Error.File, MessageBoxButtons.OK);
-                    return;
+                    try
+                    {
+                        stdout = File.Open(_filename, _filemode);
+                    }
+                    catch (Exception exc)
+                    {
+                        MessageBox.Show(exc.Message, Error.File, MessageBoxButtons.OK);
+                        return;
+                    }
                 }
             }
 
@@ -654,14 +803,30 @@ namespace DesktopRecorder
 
             #endregion
 
-            if (!checkBox3.Checked) ResetTimer(); //don't reset timer if write mode is Append
+            if (!checkBox3.Checked && !recover) ResetTimer(); //don't reset timer if write mode is Append
 
+            int count = 0;
+            retry:
             try
             {
                 mx.StartRecording();
             }
             catch (Exception exc)
             {
+                if (string.IsNullOrWhiteSpace(exc.Message))
+                {
+                    if (count < Int16.MaxValue && recover)
+                    {
+                        count++;
+                        Thread.Sleep(1);
+                        InitWasapi();
+                        goto retry;
+                    }
+                    else
+                    {
+                        mx.Dispose();
+                    }
+                }
                 Timer.Stop();
                 MessageBox.Show(exc.Message, Error.Startup, MessageBoxButtons.OK);
                 stdout.Close();
@@ -672,9 +837,14 @@ namespace DesktopRecorder
             textBox1.Enabled = false;
             comboBox2.Enabled = false;
 
-            BackColor = Color.DarkRed;
-            button1.FlatAppearance.BorderColor = BackColor;
+            if (!_transparent)
+            {
+                SetTransparencyColour(Color.DarkRed);
+                TransparencyKey = default(Color);
+            }
+
             button1.Text = _button_stop;
+            recover = false;
             recording = true;
 
             new Thread(BackgroundTimer).Start();
@@ -707,6 +877,10 @@ namespace DesktopRecorder
                 {
                     HotSwap();
                 }
+                else
+                {
+                    SaveRegistry();
+                }
             }
         }
 
@@ -715,17 +889,21 @@ namespace DesktopRecorder
         /// </summary>
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _output = (comboBox1.SelectedItem as Item).Id;
-            OutputSwap();
+            if ((sender as ComboBox).SelectedIndex == _output) return;
+            _output = (sender as ComboBox).SelectedIndex;
+            OutputSwap();            
+            SaveRegistry();
         }
 
         /// <summary>
-        /// Change mode
+        /// Change audio mode
         /// </summary>
         private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _mode = (comboBox2.SelectedItem as Item).Id;
+            if ((sender as ComboBox).SelectedIndex == _mode) return;
+            _mode = (sender as ComboBox).SelectedIndex;
             ModeSwap();
+            SaveRegistry();
         }
 
         /// <summary>
@@ -771,16 +949,101 @@ namespace DesktopRecorder
         /// <summary>
         /// Window always on top 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void checkBox4_CheckedChanged(object sender, EventArgs e)
         {
             TopMost = checkBox4.Checked;
         }
 
+        /// <summary>
+        /// Right click button menu, toggle transparency
+        /// </summary>
+        private void item1ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_transparent)
+            {
+                _transparent = false;
+                if (Width > Def.MinWidth) tableLayoutPanel2.Visible = true;
+                if (recording) SetTransparencyColour(Color.DarkRed);
+                else SetTransparencyColour(Color.WhiteSmoke);
+                TransparencyKey = default(Color);
+                BorderSwap();
+            }
+            else
+            {
+                _transparent = true;
+                FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+                if (Width == Def.MinWidth) tableLayoutPanel2.Visible = false;
+                if (_height == Def.ToggleHeight) Height = Def.ToggleHeight;
+                SetTransparencyColour(Color.Black);
+                TransparencyKey = BackColor;
+            }
+        }
+
+        /// <summary>
+        /// Right click button menu, toggle shrink window size
+        /// </summary>
+        private void item2ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tableLayoutPanel2.Visible == true)
+            {
+                tableLayoutPanel2.Visible = false;
+                Width = Def.MinWidth;
+                if (Height > Def.ToggleHeight) Height = Def.ToggleHeight;
+                if (!_transparent) FormBorderStyle = FormBorderStyle.SizableToolWindow;
+            }
+            else
+            {
+                tableLayoutPanel2.Visible = true;
+                Width = _width;
+                Height = _height;
+                if (!_transparent) BorderSwap();
+            }
+        }
+
+        /// <summary>
+        /// Right click button menu, exit
+        /// </summary>
+        private void item3ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form1_FormClosing(null, null);
+            Environment.Exit(0);
+        }
+
+        /// <summary>
+        /// Change window opacity from the slider value
+        /// </summary>
+        private void hScrollBar1_Scroll(object sender, ScrollEventArgs e)
+        {
+            Opacity = (hScrollBar1.Value + 10) / 100D;
+        }
+
         #endregion
 
         #region Sound Channel
+
+        /// <summary>
+        /// Initialize device
+        /// </summary>
+        private void InitWasapi()
+        {            
+            try
+            {
+                mx = new WasapiLoopbackCapture(); //associate with the active audio device
+                _rate = mx.WaveFormat.SampleRate;
+                _bits = 32;
+                _channels = mx.WaveFormat.Channels;
+
+                //set the callbacks
+                mx.DataAvailable += new EventHandler<WaveInEventArgs>(SoundChannel_DataAvailable);
+                mx.RecordingStopped += new EventHandler<StoppedEventArgs>(SoundChannel_RecordingStopped);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, Error.Device, MessageBoxButtons.OK);
+                Environment.Exit(exc.HResult);
+            }
+            ModeSwap();
+        }
 
         /// <summary>
         /// Recording CallBack
@@ -789,7 +1052,11 @@ namespace DesktopRecorder
         {
             if (e.BytesRecorded == 0)
             {
-                if (Timer.IsRunning) Timer.Stop();
+                if (Timer.IsRunning)
+                {
+                    mx.StopRecording();
+                    Timer.Stop();
+                }
                 return;
             }
 
@@ -829,29 +1096,47 @@ namespace DesktopRecorder
         }
 
         /// <summary>
-        /// Stopped Recording
+        /// Stopped Recording CallBack
         /// </summary>
         private void SoundChannel_RecordingStopped(object sender, StoppedEventArgs e)
         {
+
+            if (!(sender as WasapiCapture).requestStop || !Timer.IsRunning)
+            {
+                Timer.Stop();
+                if (!userRequestStop)
+                {
+                    recover = true;
+                    button1_Click(sender, e);
+                    restart = true;
+                }
+            }
+
+            userRequestStop = false;
+
             recording = false;
 
             mp3writer = null;
 
-            stdout.Close();
+            if (!recover) stdout.Close();
 
             if (_mode < 2 && _output == 0) //wav file
             {
-                //set the time duration in the Wav header now that we're complete
-                stdout = File.Open(_filename, FileMode.Open);
-                stdout.Position = 4;
-                stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 8), 0, 4);
-                stdout.Position = 40;
-                stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 44), 0, 4);
-                stdout.Close();
+                if (!recover)
+                {
+                    Thread.Sleep(1);
+                    //set the time duration in the Wav header now that we're complete
+                    stdout = File.Open(_filename, FileMode.Open);
+                    stdout.Position = 4;
+                    stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 8), 0, 4);
+                    stdout.Position = 40;
+                    stdout.Write(BitConverter.GetBytes((uint)stdout.Length - 44), 0, 4);
+                    stdout.Close();
+                }
             }
             else if (_output == 1)
             {
-                if (e.Exception != null)
+                if (e != null && e.Exception != null)
                 {
                     Exception exc = e.Exception as IOException;
                     if (exc != null)
@@ -878,16 +1163,19 @@ namespace DesktopRecorder
             }
             else if (!restart)
             {
-                Invoke(load);
-                Invoke(output); //close registry
-                Invoke(reset);
+                Invoke(loadRegistry);
+                Invoke(outputSwap); //close registry
+                Invoke(resetView);
             }
             else
             {
                 restart = false;
             }
 
-            if (e.Exception != null && _output == 0) MessageBox.Show(e.Exception.Message, Error.Recording, MessageBoxButtons.OK);
+            if (e != null && e.Exception != null && _output == 0)
+            {
+                MessageBox.Show(e.Exception.Message, Error.Recording, MessageBoxButtons.OK);
+            }
         }
 
         #endregion
@@ -947,6 +1235,17 @@ namespace DesktopRecorder
             ResetTimer();
         }
 
+        /// <summary>
+        /// Change the file extension
+        /// </summary>
+        private string SwapFileExtension(string file, string extension)
+        {
+            if (file == null) return null;
+            int i = file.LastIndexOf(Def.Dot);
+            if (i > -1) return file.Substring(0, i) + extension;
+            return file;
+        }
+
         #endregion
 
         #region Stream
@@ -963,9 +1262,7 @@ namespace DesktopRecorder
                 {
                     for (int i = chain.ChainStatus.Length - 1; i > -1; i--)
                     {
-
                         status += chain.ChainStatus[i].Status.ToString() + Environment.NewLine;
-
                     }
                 }
 
@@ -1082,6 +1379,8 @@ namespace DesktopRecorder
                 registry.SetValue(Reg.AlwaysOnTop, Def.False);
             }
             base.TopMost = bool.Parse(ontop);
+            base.Opacity = (int)registry.GetValue(Reg.Opacity, 100) / 100D;
+            _transparent = bool.Parse((string)registry.GetValue(Reg.Transparent, Def.False));
         }
 
         /// <summary>
@@ -1123,6 +1422,7 @@ namespace DesktopRecorder
                 base.WindowState = (bool.Parse(min) ? FormWindowState.Minimized : FormWindowState.Normal);
                 minimized = true;
             }
+            hScrollBar1.Value = (int)(((base.Opacity) * 100D));
         }
 
         /// <summary>
@@ -1131,6 +1431,18 @@ namespace DesktopRecorder
         private void SaveRegistry()
         {
             registry = Registry.CurrentUser.CreateSubKey(Reg.KEY);
+            
+            registry.SetValue(Reg.AlwaysOnTop, checkBox4.Checked);
+            registry.SetValue(Reg.Append, checkBox3.Checked);
+
+
+            registry.SetValue(Reg.Date, checkBox1.Checked);
+
+            if (!_transparent) registry.SetValue(Reg.Height, Height);
+
+            registry.SetValue(Reg.Left, _left);
+            registry.SetValue(Reg.Mode, _mode);
+            registry.SetValue(Reg.Opacity, (int)(base.Opacity * 100D));
             registry.SetValue(Reg.Output, _output);
             switch (_output)
             {
@@ -1141,18 +1453,15 @@ namespace DesktopRecorder
                     registry.SetValue(Reg.Stream, textBox1.Text);
                     break;
             }
-            registry.SetValue(Reg.Mode, _mode);
-            registry.SetValue(Reg.Date, checkBox1.Checked);
             registry.SetValue(Reg.Overwrite, checkBox2.Checked);
-            registry.SetValue(Reg.Append, checkBox3.Checked);
-            registry.SetValue(Reg.Verb, _verb);
-            registry.SetValue(Reg.AlwaysOnTop, checkBox4.Checked);
             registry.SetValue(Reg.StartMinimized, checkBox5.Checked);
-            registry.SetValue(Reg.Width, _width);
-            registry.SetValue(Reg.Height, _height);
-            registry.SetValue(Reg.Left, _left);
+
             registry.SetValue(Reg.Top, _top);
+            registry.SetValue(Reg.Transparent, _transparent);
             registry.SetValue(Reg.UpdateFrequency, _update);
+            registry.SetValue(Reg.Verb, _verb); 
+            registry.SetValue(Reg.Width, Width);
+            
             registry.Close();
         }
 
@@ -1160,6 +1469,25 @@ namespace DesktopRecorder
 
         #region IPC
         
+        private void InitIPC()
+        {
+            using (NamedPipeClientStream instance = new NamedPipeClientStream(Def.PipeName))
+            {
+                try
+                {
+                    instance.Connect(0);
+                    instance.ReadByte();
+                    pipe = null;
+                }
+                catch (TimeoutException) //nothing found 
+                {
+                    //only first instance running can be remote controlled
+                    remote = true;
+                    pipe = new Thread(PipeServer);
+                }
+            }
+        }
+
         /// <summary>
         /// Inter-process communication server
         /// </summary>
@@ -1175,33 +1503,35 @@ namespace DesktopRecorder
                     if (remote)
                     {
                         int msg = server.ReadByte();
-                        Invoke(load);
+                        Invoke(loadRegistry);
                         if (recording && bool.Parse((string)registry.GetValue(Reg.HotSwap, Def.False)))
                         {
                             registry = Registry.CurrentUser.CreateSubKey(Reg.KEY);
                             registry.DeleteValue(Reg.HotSwap);
                             HotSwap();
                         }
-                        Invoke(output); //close registry
-                        Invoke(mode);
+                        Invoke(outputSwap); //close registry
+                        Invoke(modeSwap);
                         //command line remote control
                         switch (msg)
                         {
                             case 1: //handshake
                                 break;
                             case 2: //start
-                                if (!recording) Invoke(click);
+                                if (!recording) Invoke(button1Click);
                                 break;
                             case 3: //stop
-                                if (recording) Invoke(click);
+                                if (recording) Invoke(button1Click);
                                 break;
                             case 4: //quit
-                                Environment.Exit(0);
+                                remote = false;
+                                Invoke(closeForm);
                                 break;
                         }
                     }
                 }
             }
+            Environment.Exit(0);
         }
         
         #endregion

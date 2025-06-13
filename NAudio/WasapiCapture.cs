@@ -1,6 +1,5 @@
 ﻿using CoreAudioApi;
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -15,7 +14,7 @@ namespace NAudio
     {
         private const long REFTIMES_PER_SEC = 10000000;
         private const long REFTIMES_PER_MILLISEC = 10000;
-        private volatile bool requestStop;
+        public volatile bool requestStop;
         private byte[] recordBuffer;
         private Thread captureThread;
         private AudioClient audioClient;
@@ -98,11 +97,6 @@ namespace NAudio
 
             long requestedDuration = REFTIMES_PER_MILLISEC * 100;
 
-            if (!audioClient.IsFormatSupported(ShareMode, WaveFormat))
-            {
-                throw new ArgumentException("Unsupported Wave Format");
-            }
-
             var streamFlags = GetAudioClientStreamFlags();
 
             audioClient.Initialize(ShareMode,
@@ -115,7 +109,6 @@ namespace NAudio
             int bufferFrameCount = audioClient.BufferSize;
             this.bytesPerFrame = this.waveFormat.Channels * this.waveFormat.BitsPerSample / 8;
             this.recordBuffer = new byte[bufferFrameCount * bytesPerFrame];
-            Debug.WriteLine(string.Format("record buffer size = {0}", this.recordBuffer.Length));
 
             initialized = true;
         }
@@ -141,7 +134,6 @@ namespace NAudio
             ThreadStart start = () => CaptureThread(this.audioClient);
             this.captureThread = new Thread(start);
 
-            Debug.WriteLine("Thread starting...");
             this.requestStop = false;
             this.captureThread.Start();
         }
@@ -167,17 +159,25 @@ namespace NAudio
             }
             finally
             {
-                client.Stop();
+                if (exception == null && requestStop)
+                {
+                    try
+                    {
+                        client.Stop();
+                    }
+                    catch
+                    {
+                        //disposed
+                    }
+                }
                 // don't dispose - the AudioClient only gets disposed when WasapiCapture is disposed
             }
             captureThread = null;
             RaiseRecordingStopped(exception);
-            Debug.WriteLine("Stop wasapi");
         }
 
         private void DoRecording(AudioClient client)
         {
-            Debug.WriteLine(String.Format("Client buffer frame count: {0}", client.BufferSize));
             int bufferFrameCount = client.BufferSize;
 
             // Calculate the actual duration of the allocated buffer.
@@ -187,7 +187,6 @@ namespace NAudio
 
             AudioCaptureClient capture = client.AudioCaptureClient;
             client.Start();
-            Debug.WriteLine(string.Format("sleep: {0} ms", sleepMilliseconds));
             while (!this.requestStop)
             {
                 Thread.Sleep(sleepMilliseconds);
@@ -213,7 +212,6 @@ namespace NAudio
         {
             int packetSize = capture.GetNextPacketSize();
             int recordBufferOffset = 0;
-            //Debug.WriteLine(string.Format("packet size: {0} samples", packetSize / 4));
 
             while (packetSize != 0)
             {

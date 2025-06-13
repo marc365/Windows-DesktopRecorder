@@ -39,11 +39,13 @@ namespace DesktopRecorder
         public const string HotSwap = "hotswap";
         public const string Left = "left";
         public const string Mode = "mode";
+        public const string Opacity = "opacity";
         public const string Output = "output";
         public const string Overwrite = "overwrite";        
         public const string StartMinimized = "start_minimized";
         public const string Stream = "stream";
         public const string Top = "top";
+        public const string Transparent = "transparent";
         public const string UpdateFrequency = "update_frequency";
         public const string Verb = "verb";
         public const string Width = "width";        

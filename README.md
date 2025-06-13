@@ -5,6 +5,7 @@
 
 * Easy installation: copy the unzipped exe to 'C:\Program Files\' and create a desktop shortcut
 * Registry settings: Computer\\HKEY_CURRENT_USER\\Software\\DesktopRecorder
+* Compatible with wine on linux
 * Run multiple instances
 * Hot swap the file name during recording
 * Remote control a running instance using itself from the command line:
@@ -12,10 +13,11 @@
     DesktopRecorder.exe -start -file C:\files\recordings\recording.wav -mode 1
     DesktopRecorder.exe -start -mode 5
     DesktopRecorder.exe -stop
-    DesktopRecorder.exe -quit
+    DesktopRecorder.exe -quit|-exit
 * Auto start record from the command line: DesktopRecorder.exe -start
 * Re-size-able GUI
-* Recording precision timer
+* Transparent button option
+* Precision recording timer
 * GET POST & PUT supports WEBDAV and TLS
 * The file name can be automatically appended with the date
 * It will default to add a count if the file name exists

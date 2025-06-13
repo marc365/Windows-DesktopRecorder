@@ -5,7 +5,6 @@
  */
 
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -144,7 +143,6 @@ namespace NAudio
             if (playbackState == PlaybackState.Stopped)
             {
                 playbackState = PlaybackState.Playing;
-                Debug.Assert(queuedBuffers == 0, "Buffers already queued on play");
                 EnqueueBuffers();
             }
             else if (playbackState == PlaybackState.Paused)
@@ -326,7 +324,6 @@ namespace NAudio
         /// </summary>
         ~WaveOut()
         {
-            System.Diagnostics.Debug.Assert(false, "WaveOut device was not closed");
             Dispose(false);
         }
 

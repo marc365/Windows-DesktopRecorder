@@ -34,7 +34,7 @@ namespace DesktopRecorder
         public const string FileSystem = "File System Error";
         public const string Header = "Header Error";
         public const string Mp3 = "Mp3 Error";
-        public const string Recording = "Recording Error";
+        public const string Recording = "File Recording Error";
         public const string Socket = "Socket Error";
         public const string Startup = "Startup Error";
         public const string Stream = "Stream Error";

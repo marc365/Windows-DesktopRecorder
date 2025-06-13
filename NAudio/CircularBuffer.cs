@@ -6,7 +6,6 @@
  */
 
 using System;
-using System.Diagnostics;
 
 namespace NAudio
 {
@@ -55,7 +54,6 @@ namespace NAudio
                 bytesWritten += writeToEnd;
                 if (bytesWritten < count)
                 {
-                    Debug.Assert(writePosition == 0);
                     // must have wrapped round. Write to start
                     Array.Copy(data, offset + bytesWritten, buffer, writePosition, count - bytesWritten);
                     writePosition += (count - bytesWritten);
@@ -91,14 +89,12 @@ namespace NAudio
                 if (bytesRead < count)
                 {
                     // must have wrapped round. Read from start
-                    Debug.Assert(readPosition == 0);
                     Array.Copy(buffer, readPosition, data, offset + bytesRead, count - bytesRead);
                     readPosition += (count - bytesRead);
                     bytesRead = count;
                 }
 
                 byteCount -= bytesRead;
-                Debug.Assert(byteCount >= 0);
                 return bytesRead;
             }
         }

@@ -57,27 +57,33 @@ namespace DesktopRecorder
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.comboBox2 = new System.Windows.Forms.ComboBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
+            this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.item1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.item2ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.item3ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.checkBox5 = new System.Windows.Forms.CheckBox();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
+            this.checkBox2 = new System.Windows.Forms.CheckBox();
             this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.button2 = new System.Windows.Forms.Button();
+            this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.textBox1 = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
+            this.hScrollBar1 = new System.Windows.Forms.HScrollBar();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
-            this.checkBox4 = new System.Windows.Forms.CheckBox();
-            this.checkBox5 = new System.Windows.Forms.CheckBox();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.contextMenuStrip1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -86,87 +92,59 @@ namespace DesktopRecorder
             this.flowLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // textBox1
+            // contextMenuStrip1
             // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.textBox1.Location = new System.Drawing.Point(65, 36);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(1, 20);
-            this.textBox1.TabIndex = 1;
-            this.toolTip1.SetToolTip(this.textBox1, "File name");
+            this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.item1ToolStripMenuItem,
+            this.item2ToolStripMenuItem,
+            this.item3ToolStripMenuItem});
+            this.contextMenuStrip1.Name = "contextMenuStrip1";
+            this.contextMenuStrip1.Size = new System.Drawing.Size(156, 76);
             // 
-            // button1
+            // item1ToolStripMenuItem
             // 
-            this.button1.BackColor = System.Drawing.Color.Transparent;
-            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.button1.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
-            this.button1.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Transparent;
-            this.button1.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Transparent;
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.ForeColor = System.Drawing.Color.LightGray;
-            this.button1.Location = new System.Drawing.Point(0, 0);
-            this.button1.Margin = new System.Windows.Forms.Padding(0);
-            this.button1.Name = "button1";
-            this.button1.Padding = new System.Windows.Forms.Padding(0, 0, 2, 2);
-            this.button1.Size = new System.Drawing.Size(123, 119);
-            this.button1.TabIndex = 2;
-            this.toolTip1.SetToolTip(this.button1, "One click Record & Stop");
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.item1ToolStripMenuItem.Name = "item1ToolStripMenuItem";
+            this.item1ToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
+            this.item1ToolStripMenuItem.Text = "Transparent";
+            this.item1ToolStripMenuItem.Click += new System.EventHandler(this.item1ToolStripMenuItem_Click);
             // 
-            // button2
+            // item2ToolStripMenuItem
             // 
-            this.button2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.button2.Location = new System.Drawing.Point(-122, 35);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(24, 21);
-            this.button2.TabIndex = 3;
-            this.button2.Text = "...";
-            this.toolTip1.SetToolTip(this.button2, "Open the file selector");
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.item2ToolStripMenuItem.Name = "item2ToolStripMenuItem";
+            this.item2ToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
+            this.item2ToolStripMenuItem.Text = "Shrink";
+            this.item2ToolStripMenuItem.Click += new System.EventHandler(this.item2ToolStripMenuItem_Click);
             // 
-            // comboBox2
+            // item3ToolStripMenuItem
             // 
-            this.comboBox2.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.comboBox2.FormattingEnabled = true;
-            this.comboBox2.Location = new System.Drawing.Point(-92, 35);
-            this.comboBox2.Name = "comboBox2";
-            this.comboBox2.Size = new System.Drawing.Size(90, 21);
-            this.comboBox2.TabIndex = 9;
-            this.toolTip1.SetToolTip(this.comboBox2, "Select output type");
-            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            this.item3ToolStripMenuItem.Name = "item3ToolStripMenuItem";
+            this.item3ToolStripMenuItem.Size = new System.Drawing.Size(155, 24);
+            this.item3ToolStripMenuItem.Text = "Exit";
+            this.item3ToolStripMenuItem.Click += new System.EventHandler(this.item3ToolStripMenuItem_Click);
             // 
-            // checkBox1
+            // checkBox5
             // 
-            this.checkBox1.Location = new System.Drawing.Point(0, 0);
-            this.checkBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(49, 17);
-            this.checkBox1.TabIndex = 10;
-            this.checkBox1.Text = "Date";
-            this.toolTip1.SetToolTip(this.checkBox1, "Add the date to the file name");
+            this.checkBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkBox5.AutoSize = true;
+            this.checkBox5.Location = new System.Drawing.Point(79, 3);
+            this.checkBox5.Name = "checkBox5";
+            this.checkBox5.Size = new System.Drawing.Size(72, 17);
+            this.checkBox5.TabIndex = 23;
+            this.checkBox5.Text = "Minimized";
+            this.toolTip1.SetToolTip(this.checkBox5, "Start minimized");
             // 
-            // comboBox1
+            // checkBox4
             // 
-            this.comboBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(3, 35);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(56, 21);
-            this.comboBox1.TabIndex = 11;
-            this.toolTip1.SetToolTip(this.comboBox1, "Select output destination");
-            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.Location = new System.Drawing.Point(49, 0);
-            this.checkBox2.Margin = new System.Windows.Forms.Padding(0);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(71, 17);
-            this.checkBox2.TabIndex = 12;
-            this.checkBox2.Text = "Overwrite";
-            this.toolTip1.SetToolTip(this.checkBox2, "Overwrite the file");
+            this.checkBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Location = new System.Drawing.Point(157, 3);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.checkBox4.Size = new System.Drawing.Size(45, 17);
+            this.checkBox4.TabIndex = 22;
+            this.checkBox4.Text = "Top";
+            this.toolTip1.SetToolTip(this.checkBox4, "Keep the window on top");
+            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
             // 
             // label1
             // 
@@ -179,15 +157,15 @@ namespace DesktopRecorder
             this.label1.Location = new System.Drawing.Point(1, 3);
             this.label1.Margin = new System.Windows.Forms.Padding(1, 3, 0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(0, 24);
+            this.label1.Size = new System.Drawing.Size(0, 23);
             this.label1.TabIndex = 13;
             this.toolTip1.SetToolTip(this.label1, "Recording time (click to reset)");
             this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // radioButton1
             // 
-            this.radioButton1.Location = new System.Drawing.Point(54, 17);
-            this.radioButton1.Margin = new System.Windows.Forms.Padding(0);
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Location = new System.Drawing.Point(61, 26);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(42, 17);
             this.radioButton1.TabIndex = 14;
@@ -197,8 +175,8 @@ namespace DesktopRecorder
             // 
             // radioButton2
             // 
-            this.radioButton2.Location = new System.Drawing.Point(96, 17);
-            this.radioButton2.Margin = new System.Windows.Forms.Padding(0);
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.Location = new System.Drawing.Point(109, 26);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(46, 17);
             this.radioButton2.TabIndex = 15;
@@ -208,8 +186,8 @@ namespace DesktopRecorder
             // 
             // radioButton3
             // 
-            this.radioButton3.Location = new System.Drawing.Point(142, 17);
-            this.radioButton3.Margin = new System.Windows.Forms.Padding(0);
+            this.radioButton3.AutoSize = true;
+            this.radioButton3.Location = new System.Drawing.Point(161, 26);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(41, 17);
             this.radioButton3.TabIndex = 16;
@@ -217,10 +195,30 @@ namespace DesktopRecorder
             this.toolTip1.SetToolTip(this.radioButton3, "HTTP PUT");
             this.radioButton3.CheckedChanged += new System.EventHandler(this.radioButton3_CheckedChanged);
             // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(7, 3);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(49, 17);
+            this.checkBox1.TabIndex = 10;
+            this.checkBox1.Text = "Date";
+            this.toolTip1.SetToolTip(this.checkBox1, "Add the date to the file name");
+            // 
+            // checkBox2
+            // 
+            this.checkBox2.AutoSize = true;
+            this.checkBox2.Location = new System.Drawing.Point(62, 3);
+            this.checkBox2.Name = "checkBox2";
+            this.checkBox2.Size = new System.Drawing.Size(71, 17);
+            this.checkBox2.TabIndex = 12;
+            this.checkBox2.Text = "Overwrite";
+            this.toolTip1.SetToolTip(this.checkBox2, "Overwrite the file");
+            // 
             // checkBox3
             // 
-            this.checkBox3.Location = new System.Drawing.Point(120, 0);
-            this.checkBox3.Margin = new System.Windows.Forms.Padding(0);
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Location = new System.Drawing.Point(139, 3);
             this.checkBox3.Name = "checkBox3";
             this.checkBox3.Size = new System.Drawing.Size(63, 17);
             this.checkBox3.TabIndex = 17;
@@ -228,12 +226,76 @@ namespace DesktopRecorder
             this.toolTip1.SetToolTip(this.checkBox3, "Start recording from the end of the file ");
             this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
+            // comboBox1
+            // 
+            this.comboBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.comboBox1.Enabled = false;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(3, 33);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(56, 21);
+            this.comboBox1.TabIndex = 11;
+            this.toolTip1.SetToolTip(this.comboBox1, "Select output destination");
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
+            // 
+            // button2
+            // 
+            this.button2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.button2.Location = new System.Drawing.Point(564, 33);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(24, 21);
+            this.button2.TabIndex = 3;
+            this.button2.Text = "...";
+            this.toolTip1.SetToolTip(this.button2, "Open the file selector");
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // comboBox2
+            // 
+            this.comboBox2.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.comboBox2.FormattingEnabled = true;
+            this.comboBox2.Location = new System.Drawing.Point(594, 33);
+            this.comboBox2.Name = "comboBox2";
+            this.comboBox2.Size = new System.Drawing.Size(90, 21);
+            this.comboBox2.TabIndex = 9;
+            this.toolTip1.SetToolTip(this.comboBox2, "Select output type");
+            this.comboBox2.SelectedIndexChanged += new System.EventHandler(this.comboBox2_SelectedIndexChanged);
+            // 
+            // button1
+            // 
+            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.button1.ContextMenuStrip = this.contextMenuStrip1;
+            this.button1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.button1.FlatAppearance.BorderSize = 0;
+            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button1.ForeColor = System.Drawing.Color.Transparent;
+            this.button1.Location = new System.Drawing.Point(0, 0);
+            this.button1.Margin = new System.Windows.Forms.Padding(0);
+            this.button1.Name = "button1";
+            this.button1.Padding = new System.Windows.Forms.Padding(0, 0, 2, 2);
+            this.button1.Size = new System.Drawing.Size(140, 114);
+            this.button1.TabIndex = 2;
+            this.toolTip1.SetToolTip(this.button1, "One click Record & Stop");
+            this.button1.UseVisualStyleBackColor = false;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.button1_MouseDown);
+            this.button1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.button1_MouseMove);
+            this.button1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.button1_MouseUp);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.textBox1.Location = new System.Drawing.Point(65, 34);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(493, 20);
+            this.textBox1.TabIndex = 1;
+            // 
             // tableLayoutPanel1
             // 
             this.tableLayoutPanel1.AutoSize = true;
             this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 123F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.button1, 0, 0);
@@ -243,23 +305,26 @@ namespace DesktopRecorder
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(124, 119);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(834, 114);
             this.tableLayoutPanel1.TabIndex = 18;
             // 
             // tableLayoutPanel2
             // 
+            this.tableLayoutPanel2.BackColor = System.Drawing.Color.Transparent;
             this.tableLayoutPanel2.ColumnCount = 1;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel3, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.tableLayoutPanel4, 0, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(123, 0);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(140, 0);
             this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(0, 0, 7, 0);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(1, 119);
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(687, 114);
             this.tableLayoutPanel2.TabIndex = 19;
             // 
             // tableLayoutPanel3
@@ -280,25 +345,26 @@ namespace DesktopRecorder
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(1, 59);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(687, 57);
             this.tableLayoutPanel3.TabIndex = 20;
             // 
             // tableLayoutPanel4
             // 
             this.tableLayoutPanel4.ColumnCount = 2;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
             this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 183F));
             this.tableLayoutPanel4.Controls.Add(this.flowLayoutPanel1, 1, 0);
             this.tableLayoutPanel4.Controls.Add(this.label1, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.hScrollBar1, 0, 1);
             this.tableLayoutPanel4.Controls.Add(this.flowLayoutPanel2, 1, 1);
             this.tableLayoutPanel4.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tableLayoutPanel4.Location = new System.Drawing.Point(0, 59);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(0, 57);
             this.tableLayoutPanel4.Margin = new System.Windows.Forms.Padding(0);
             this.tableLayoutPanel4.Name = "tableLayoutPanel4";
             this.tableLayoutPanel4.RowCount = 2;
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 16F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(1, 43);
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 26F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(687, 48);
             this.tableLayoutPanel4.TabIndex = 21;
             // 
             // flowLayoutPanel1
@@ -311,11 +377,22 @@ namespace DesktopRecorder
             this.flowLayoutPanel1.Controls.Add(this.radioButton1);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(-182, 5);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(482, 5);
             this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(0, 5, 0, 0);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(183, 22);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(205, 21);
             this.flowLayoutPanel1.TabIndex = 20;
+            // 
+            // hScrollBar1
+            // 
+            this.hScrollBar1.Location = new System.Drawing.Point(3, 29);
+            this.hScrollBar1.Margin = new System.Windows.Forms.Padding(3);
+            this.hScrollBar1.MinimumSize = new System.Drawing.Size(107, 15);
+            this.hScrollBar1.Name = "hScrollBar1";
+            this.hScrollBar1.Size = new System.Drawing.Size(107, 15);
+            this.hScrollBar1.TabIndex = 24;
+            this.hScrollBar1.Value = 100;
+            this.hScrollBar1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.hScrollBar1_Scroll);
             // 
             // flowLayoutPanel2
             // 
@@ -323,37 +400,11 @@ namespace DesktopRecorder
             this.flowLayoutPanel2.Controls.Add(this.checkBox5);
             this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flowLayoutPanel2.Location = new System.Drawing.Point(-182, 27);
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(482, 26);
             this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(0);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
-            this.flowLayoutPanel2.Size = new System.Drawing.Size(183, 16);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(205, 31);
             this.flowLayoutPanel2.TabIndex = 21;
-            // 
-            // checkBox4
-            // 
-            this.checkBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.checkBox4.AutoSize = true;
-            this.checkBox4.Location = new System.Drawing.Point(138, 0);
-            this.checkBox4.Margin = new System.Windows.Forms.Padding(0);
-            this.checkBox4.Name = "checkBox4";
-            this.checkBox4.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.checkBox4.Size = new System.Drawing.Size(45, 17);
-            this.checkBox4.TabIndex = 22;
-            this.checkBox4.Text = "Top";
-            this.toolTip1.SetToolTip(this.checkBox4, "Keep the window on top");
-            this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
-            // 
-            // checkBox5
-            // 
-            this.checkBox5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.checkBox5.AutoSize = true;
-            this.checkBox5.Location = new System.Drawing.Point(66, 0);
-            this.checkBox5.Margin = new System.Windows.Forms.Padding(0);
-            this.checkBox5.Name = "checkBox5";
-            this.checkBox5.Size = new System.Drawing.Size(72, 17);
-            this.checkBox5.TabIndex = 23;
-            this.checkBox5.Text = "Minimized";
-            this.toolTip1.SetToolTip(this.checkBox5, "Start minimized");
             // 
             // Form1
             // 
@@ -361,10 +412,12 @@ namespace DesktopRecorder
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(124, 119);
+            this.ClientSize = new System.Drawing.Size(834, 114);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Cursor = System.Windows.Forms.Cursors.Default;
+            this.DoubleBuffered = true;
             this.ForeColor = System.Drawing.SystemColors.ControlDark;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.MaximizeBox = false;
@@ -379,6 +432,7 @@ namespace DesktopRecorder
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Shown += new System.EventHandler(this.Form1_Shown);
             this.ResizeEnd += new System.EventHandler(this.Form1_Resized);
+            this.contextMenuStrip1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
@@ -386,6 +440,7 @@ namespace DesktopRecorder
             this.tableLayoutPanel4.ResumeLayout(false);
             this.tableLayoutPanel4.PerformLayout();
             this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.PerformLayout();
             this.flowLayoutPanel2.ResumeLayout(false);
             this.flowLayoutPanel2.PerformLayout();
             this.ResumeLayout(false);
@@ -394,27 +449,33 @@ namespace DesktopRecorder
         }
 
         #endregion
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
-        private ComboBox comboBox2;
-        private CheckBox checkBox1;
-        private ComboBox comboBox1;
-        private CheckBox checkBox2;
-        private Label label1;
-        private RadioButton radioButton1;
-        private RadioButton radioButton2;
-        private RadioButton radioButton3;
-        private CheckBox checkBox3;
+
+        private ToolTip toolTip1;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem item1ToolStripMenuItem;
+        private ToolStripMenuItem item2ToolStripMenuItem;
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel2;
         private TableLayoutPanel tableLayoutPanel3;
-        private FlowLayoutPanel flowLayoutPanel1;
+        private ComboBox comboBox2;
+        private Button button2;
+        private ComboBox comboBox1;
+        private TextBox textBox1;
         private TableLayoutPanel tableLayoutPanel4;
+        private FlowLayoutPanel flowLayoutPanel1;
+        private CheckBox checkBox3;
+        private CheckBox checkBox2;
+        private CheckBox checkBox1;
+        private RadioButton radioButton3;
+        private RadioButton radioButton2;
+        private RadioButton radioButton1;
+        private Label label1;
         private FlowLayoutPanel flowLayoutPanel2;
         private CheckBox checkBox4;
         private CheckBox checkBox5;
-        private ToolTip toolTip1;
+        private Button button1;
+        private HScrollBar hScrollBar1;
+        private ToolStripMenuItem item3ToolStripMenuItem;
     }
 }
 

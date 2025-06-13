@@ -31,8 +31,8 @@ namespace DesktopRecorder
         public const string PipeName = "recorder-desktop";
         public const string DateStamp = " yyyy-MM-dd";
         public const string LameDll = "libmp3lame.dll";
+        public const string LameResource = "DesktopRecorder." + LameDll;
         public const string TimeStamp = "hh':'mm':'ss'.'fffffff";
-        public const string ShortStamp = "hh':'mm':'ss";
         public const string Font = "Microsoft Sans Serif";
         public const string True = "True";
         public const string False = "False";
@@ -64,10 +64,11 @@ namespace DesktopRecorder
         public const string Authorization = "Authorization: ";
         public const string Host = "Host: ";
         public const string Location = "Location: ";
-        
+
+        public const int MinWidth = 140;
         public const int ToggleHeight = 158;
         public const int ToolWidth = 335;
-        public const int ShortWidth = 402;
-        public const int ShortTimeWidth = 415;
+        public const int ShortWidth = 286;
+        public const int TinyWidth = 230;
     }
 }

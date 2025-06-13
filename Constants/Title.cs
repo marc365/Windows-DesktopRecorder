@@ -30,7 +30,9 @@ namespace DesktopRecorder
         public const string Record = "Record";
         public const string Stop = "Stop";
         public const string File = "File";
+        public const string FileName = "File name";
         public const string Stream = "Stream";
+        public const string StreamLocation = "Stream location";
         public const string SaveAs = "Save As";
         public const string FileSelector = "{0} files (*.{0})|*.{0}|All files (*.*)|*.*";        
         public const string ServerResponse = "Server Response";

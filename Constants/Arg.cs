@@ -33,5 +33,6 @@ namespace DesktopRecorder
         public const string Start = "-start";
         public const string Stop = "-stop";
         public const string Quit = "-quit";
+        public const string Exit = "-exit";
     }
 }

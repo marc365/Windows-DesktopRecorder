@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace NAudio
@@ -49,7 +48,6 @@ namespace NAudio
             // TEST: we might not actually need to bother unpreparing and repreparing
             MmException.Try(WaveInterop.waveInUnprepareHeader(waveInHandle, header, Marshal.SizeOf(header)), "waveUnprepareHeader");
             MmException.Try(WaveInterop.waveInPrepareHeader(waveInHandle, header, Marshal.SizeOf(header)), "waveInPrepareHeader");
-            //System.Diagnostics.Debug.Assert(header.bytesRecorded == 0, "bytes recorded was not reset properly");
             MmException.Try(WaveInterop.waveInAddBuffer(waveInHandle, header, Marshal.SizeOf(header)), "waveInAddBuffer");
         }
 
@@ -61,7 +59,6 @@ namespace NAudio
         ~WaveInBuffer()
         {
             Dispose(false);
-            System.Diagnostics.Debug.Assert(true, "WaveInBuffer was not disposed");
         }
 
         /// <summary>
